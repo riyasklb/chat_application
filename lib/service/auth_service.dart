@@ -7,7 +7,9 @@ class AuthService {
   }
 
   FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-  AuthService() {}
+  AuthService() {
+   // _firebaseAuth.authStateChanges().listen(autostatechengerstreamlisener);
+  }
   Future<bool> login(String email, String password) async {
     try {
       final cridental = await _firebaseAuth.signInWithEmailAndPassword(
@@ -20,5 +22,14 @@ class AuthService {
       print(e);
     }
     return false;
+    
   }
+//  void autostatechengerstreamlisener(User? user) {
+//     if (user != null) {
+//       _user = user;
+//     } else {
+//       _user = null;
+//     }
+//   }
+ 
 }
