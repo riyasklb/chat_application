@@ -1,3 +1,4 @@
+import 'package:chat_application/service/alert_service.dart';
 import 'package:chat_application/service/auth_service.dart';
 import 'package:chat_application/service/navigation_service.dart';
 import 'package:chat_application/widget/const.dart';
@@ -17,6 +18,7 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     _authService = _getIt.get<AuthService>();
     _navigationService = _getIt.get<NavigationService>();
+    _alertService = _getIt.get<AlertService>();
     super.initState();
   }
 
@@ -25,6 +27,7 @@ class _LoginPageState extends State<LoginPage> {
   final GetIt _getIt = GetIt.instance;
   late NavigationService _navigationService;
   late AuthService _authService;
+  late AlertService _alertService;
 
   String? email, password;
 
@@ -38,7 +41,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget _buidUI() {
     return SafeArea(
       child: Padding(
-        padding: EdgeInsets.symmetric(
+        padding: const EdgeInsets.symmetric(
           horizontal: 15,
           vertical: 20,
         ),
@@ -96,7 +99,14 @@ class _LoginPageState extends State<LoginPage> {
 
               if (result) {
                 _navigationService.pushReplacementNamed('/home');
-              } else {}
+                _alertService.showToasr(
+                    text: 'success fully login', icon: Icons.check);
+              } else {
+                print('--------------------------------------');
+
+                _alertService.showToasr(text: 'try again', icon: Icons.warning);
+                print('--------------------------------------');
+              }
             }
           },
           child: Text('login'),
@@ -109,10 +119,15 @@ class _LoginPageState extends State<LoginPage> {
         crossAxisAlignment: CrossAxisAlignment.end,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text("Don't have an account"),
-          Text(
-            'SignUp',
-            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+          const Text("Don't have an account ?"),
+          InkWell(
+            onTap: () {
+              _navigationService.pushNamed("/registration");
+            },
+            child: const Text(
+              'signup',
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+            ),
           )
         ],
       ),
