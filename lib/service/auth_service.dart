@@ -24,6 +24,27 @@ class AuthService {
     return false;
   }
 
+
+
+
+
+
+
+    Future<bool> register(String email, String password) async {
+    try {
+      final cridental = await _firebaseAuth.createUserWithEmailAndPassword(
+          email: email, password: password);
+      if (cridental.user != null) {
+        _user = cridental.user;
+        return true;
+      }
+    } catch (e) {
+      print(e);
+    }
+    return false;
+  }
+
+
   Future<bool> logout() async {
     try {
       await _firebaseAuth.signOut();

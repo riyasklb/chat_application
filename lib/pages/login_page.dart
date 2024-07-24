@@ -102,10 +102,7 @@ class _LoginPageState extends State<LoginPage> {
                 _alertService.showToasr(
                     text: 'success fully login', icon: Icons.check);
               } else {
-                print('--------------------------------------');
-
                 _alertService.showToasr(text: 'try again', icon: Icons.warning);
-                print('--------------------------------------');
               }
             }
           },

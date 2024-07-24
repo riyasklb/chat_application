@@ -13,6 +13,7 @@ class CustiomFormfiled extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      autovalidateMode: AutovalidateMode.onUserInteraction,
       onSaved: onSaved,
       validator: (value) {
         if (value != null && regExpressionvalidation.hasMatch(value)) {
