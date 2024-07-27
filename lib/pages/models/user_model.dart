@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 class UserProfile {
   String? uid;
   String? name;
@@ -17,7 +19,7 @@ class UserProfile {
 
   // Method for JSON serialization
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{}; // Corrected map initialization
+    final Map<String, dynamic> data = <String, dynamic>;Array; // Corrected map initialization
     data['uid'] = uid;
     data['name'] = name;
     data['pfpURL'] = pfpURL;
