@@ -1,11 +1,26 @@
-import 'package:flutter/foundation.dart';
+
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 class ChatTile extends StatelessWidget {
-  const ChatTile({super.key});
+  final   userProfile;
+  final Function ontap;
+  ChatTile({super.key, required this.userProfile, required this.ontap});
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return InkWell(
+      onTap: () {
+        ontap();
+      },
+      child: ListTile(
+        dense: false,
+        leading: CircleAvatar(
+            backgroundImage: NetworkImage(
+          userProfile.pfpURL!,
+        ),),
+        title: Text(userProfile.name!),
+      ),
+    );
   }
 }

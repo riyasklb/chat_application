@@ -23,6 +23,12 @@ class NavigationService {
   NavigationService() {
     _navigatorkey = GlobalKey<NavigatorState>();
   }
+  void push(MaterialPageRoute route) {
+    _navigatorkey.currentState?.push(route);
+  }
+
+
+
 
   void pushNamed(String routeName) {
     _navigatorkey.currentState?.pushNamed(routeName);

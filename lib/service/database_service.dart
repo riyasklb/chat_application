@@ -1,12 +1,16 @@
+import 'dart:ffi';
 
-import 'package:chat_application/pages/models/user_model.dart';
+import 'package:chat_application/models/chat.dart';
+import 'package:chat_application/models/user_model.dart';
 import 'package:chat_application/service/auth_service.dart';
+import 'package:chat_application/utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get_it/get_it.dart';
 
 class DatabaseService {
   final GetIt _getIt = GetIt.instance;
   CollectionReference? _usersCollection;
+  CollectionReference? _userschatcollection;
   late AuthService _authService;
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
   DatabaseService() {
@@ -21,6 +25,12 @@ class DatabaseService {
                   UserProfile.fromJson(snapshot.data()!),
               toFirestore: (UserProfile, _) => UserProfile.toJson(),
             );
+
+    _userschatcollection = _firebaseFirestore
+        .collection('chats')
+        .withConverter<Chat>(
+            fromFirestore: (snapshot, _) => Chat.fromJson(snapshot.data()!),
+            toFirestore: (chat, _) => chat.toJson());
   }
 
   Future<void> createUserProfile({required UserProfile userprofile}) async {
@@ -31,5 +41,26 @@ class DatabaseService {
     return _usersCollection
         ?.where("uid", isNotEqualTo: _authService.user!.uid)
         .snapshots() as Stream<QuerySnapshot<UserProfile>>;
+  }
+
+  Future<bool> checkchatExist(String uid1, String uid2) async {
+    String chatID = generateChatID(uid1: uid1, uid2: uid2);
+    final result = await _userschatcollection?.doc(chatID).get();
+    if (result != null) {
+      return result.exists;
+    }
+    return false;
+  }
+
+  Future createNewChat(String uid1, String uid2) async {
+    String chatID = generateChatID(uid1: uid1, uid2: uid2);
+    final docref =  _userschatcollection!.doc(chatID);
+    final chat = Chat(
+      id: chatID,
+      participants: [uid1, uid2],
+      messages: [],
+    );
+    await docref.set(chat);
+    
   }
 }

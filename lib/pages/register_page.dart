@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:chat_application/pages/models/user_model.dart';
+import 'package:chat_application/models/user_model.dart';
 import 'package:chat_application/service/alert_service.dart';
 import 'package:chat_application/service/auth_service.dart';
 import 'package:chat_application/service/database_service.dart';

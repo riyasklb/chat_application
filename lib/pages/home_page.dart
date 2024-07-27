@@ -1,7 +1,10 @@
+import 'package:chat_application/models/user_model.dart';
+import 'package:chat_application/pages/chat_page.dart';
 import 'package:chat_application/service/alert_service.dart';
 import 'package:chat_application/service/auth_service.dart';
 import 'package:chat_application/service/database_service.dart';
 import 'package:chat_application/service/navigation_service.dart';
+import 'package:chat_application/widget/chat_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
@@ -58,11 +61,7 @@ class _HomePageState extends State<HomePage> {
           horizontal: 15,
           vertical: 20,
         ),
-        child: Column(
-          children: [
-            _chatList(),
-          ],
-        ),
+        child: _chatList(),
       ),
     );
   }
@@ -80,10 +79,36 @@ class _HomePageState extends State<HomePage> {
             child: Text('Unable to load data'),
           );
         } else if (snapshot.hasData && snapshot.data != null) {
-          print('---------------------------');
-          print(snapshot.data);
-          print('---------------------------');
-          return ListView();
+          final data = snapshot.data!.docs;
+          return ListView.builder(
+            itemBuilder: (context, index) {
+              UserProfile user = data[index].data();
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: ChatTile(
+                  userProfile: user,
+                  ontap: () async {
+                    final chatExist = await _databaseService.checkchatExist(
+                        _authService.user!.uid, user.uid!);
+                    if (!chatExist) {
+                      await _databaseService.createNewChat(
+                        _authService.user!.uid,
+                        user.uid!,
+                      );
+                    }
+                    _navigationService.push(
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return ChatPage(user: user);
+                        },
+                      ),
+                    );
+                  },
+                ),
+              );
+            },
+            itemCount: data.length,
+          );
         } else {
           return Center(
             child: Text('No data available'),
