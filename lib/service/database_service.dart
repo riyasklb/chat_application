@@ -1,6 +1,5 @@
-import 'dart:ffi';
-
 import 'package:chat_application/models/chat.dart';
+import 'package:chat_application/models/message.dart';
 import 'package:chat_application/models/user_model.dart';
 import 'package:chat_application/service/auth_service.dart';
 import 'package:chat_application/utils.dart';
@@ -54,13 +53,31 @@ class DatabaseService {
 
   Future createNewChat(String uid1, String uid2) async {
     String chatID = generateChatID(uid1: uid1, uid2: uid2);
-    final docref =  _userschatcollection!.doc(chatID);
+    final docref = _userschatcollection!.doc(chatID);
     final chat = Chat(
       id: chatID,
       participants: [uid1, uid2],
       messages: [],
     );
     await docref.set(chat);
-    
+  }
+
+  Future<void> sendChatMessage(
+      String uid1, String uid2, Message message) async {
+    String chatID = generateChatID(uid1: uid1, uid2: uid2);
+    final docref = _userschatcollection!.doc(chatID);
+    await docref.update(
+      {
+        "messages": FieldValue.arrayUnion(
+          [
+            message.toJson(),
+          ],
+        ),
+      },
+    );
+  }
+  Stream <DocumentSnapshot<Chat>>getChatData(String uid1,String uid2){
+    String chatID = generateChatID(uid1: uid1, uid2: uid2);
+    return   _userschatcollection?.doc(chatID).snapshots() as Stream<DocumentSnapshot<Chat>>;
   }
 }
