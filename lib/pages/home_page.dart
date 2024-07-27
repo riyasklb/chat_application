@@ -18,12 +18,13 @@ class _HomePageState extends State<HomePage> {
   late AuthService _authService;
   late DatabaseService _databaseService;
   late AlertService _alertService;
+
   @override
   void initState() {
     _authService = _getIt.get<AuthService>();
     _navigationService = _getIt.get<NavigationService>();
     _alertService = _getIt.get<AlertService>();
-     _databaseService = _getIt.get<DatabaseService>();
+    _databaseService = _getIt.get<DatabaseService>();
     super.initState();
   }
 
@@ -39,16 +40,18 @@ class _HomePageState extends State<HomePage> {
               if (result) {
                 _navigationService.pushReplacementNamed("/login");
                 _alertService.showToasr(
-                    text: 'User registerd successfuly', icon: Icons.check);
+                    text: 'User logged out successfully', icon: Icons.check);
               }
             },
             icon: Icon(Icons.logout),
           ),
         ],
       ),
-  body: _buidUI(),   );
+      body: _buildUI(),
+    );
   }
-  Widget _buidUI() {
+
+  Widget _buildUI() {
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.symmetric(
@@ -56,15 +59,37 @@ class _HomePageState extends State<HomePage> {
           vertical: 20,
         ),
         child: Column(
-      
           children: [
-          _profilelist(),
+            _chatList(),
           ],
         ),
       ),
     );
   }
-Widget _profilelist(){
-  return Column(children: [Text('')],);
-}
+
+  Widget _chatList() {
+    return StreamBuilder(
+      stream: _databaseService.getUserProfile(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        } else if (snapshot.hasError) {
+          return Center(
+            child: Text('Unable to load data'),
+          );
+        } else if (snapshot.hasData && snapshot.data != null) {
+          print('---------------------------');
+          print(snapshot.data);
+          print('---------------------------');
+          return ListView();
+        } else {
+          return Center(
+            child: Text('No data available'),
+          );
+        }
+      },
+    );
+  }
 }

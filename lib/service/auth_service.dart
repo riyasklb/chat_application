@@ -2,20 +2,22 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthService {
   User? _user;
-  User? get user {
-    return _user;
+  User? get user => _user;
+
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+
+  AuthService() {
+    _firebaseAuth.authStateChanges().listen(_authStateChangesListener);
   }
 
-  FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-  AuthService() {
-     _firebaseAuth.authStateChanges().listen(autostatechengerstreamlisener);
-  }
   Future<bool> login(String email, String password) async {
     try {
-      final cridental = await _firebaseAuth.signInWithEmailAndPassword(
-          email: email, password: password);
-      if (cridental.user != null) {
-        _user = cridental.user;
+      final credential = await _firebaseAuth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      if (credential.user != null) {
+        _user = credential.user;
         return true;
       }
     } catch (e) {
@@ -24,18 +26,14 @@ class AuthService {
     return false;
   }
 
-
-
-
-
-
-
-    Future<bool> register(String email, String password) async {
+  Future<bool> register(String email, String password) async {
     try {
-      final cridental = await _firebaseAuth.createUserWithEmailAndPassword(
-          email: email, password: password);
-      if (cridental.user != null) {
-        _user = cridental.user;
+      final credential = await _firebaseAuth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      if (credential.user != null) {
+        _user = credential.user;
         return true;
       }
     } catch (e) {
@@ -43,11 +41,11 @@ class AuthService {
     }
     return false;
   }
-
 
   Future<bool> logout() async {
     try {
       await _firebaseAuth.signOut();
+      _user = null;
       return true;
     } catch (e) {
       print(e);
@@ -55,11 +53,7 @@ class AuthService {
     return false;
   }
 
- void autostatechengerstreamlisener(User? user) {
-    if (user != null) {
-      _user = user;
-    } else {
-      _user = null;
-    }
+  void _authStateChangesListener(User? user) {
+    _user = user;
   }
 }
