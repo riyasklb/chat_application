@@ -1,6 +1,10 @@
 import 'dart:io';
 
+
+import 'package:chat_application/pages/models/user_model.dart';
+import 'package:chat_application/service/alert_service.dart';
 import 'package:chat_application/service/auth_service.dart';
+import 'package:chat_application/service/database_service.dart';
 import 'package:chat_application/service/media_service%20.dart';
 import 'package:chat_application/service/navigation_service.dart';
 import 'package:chat_application/service/storge_service.dart';
@@ -23,9 +27,13 @@ class _ResgisterPageState extends State<ResgisterPage> {
     _navigationService = _getIt.get<NavigationService>();
     _authService = _getIt.get<AuthService>();
     _storgeService = _getIt.get<StorgeService>();
+    _databaseService = _getIt.get<DatabaseService>();
+    _alertService = _getIt.get<AlertService>();
     super.initState();
   }
 
+  late AlertService _alertService;
+  late DatabaseService _databaseService;
   late StorgeService _storgeService;
   final GlobalKey<FormState> _registerformkey = GlobalKey();
   late NavigationService _navigationService;
@@ -135,6 +143,7 @@ class _ResgisterPageState extends State<ResgisterPage> {
         child: MaterialButton(
           onPressed: () async {
             try {
+              print('-------------------------------');
               if ((_registerformkey.currentState?.validate() ?? false) &&
                   selectedimage != null) {
                 _registerformkey.currentState?.save();
@@ -143,6 +152,18 @@ class _ResgisterPageState extends State<ResgisterPage> {
                 if (result) {
                   String? pfpURL = await _storgeService.uploadUserPfp(
                       file: selectedimage!, uid: _authService.user!.uid);
+                  if (pfpURL != null) {
+                    await _databaseService.createUserProfile(
+                        userprofile: UserProfile(
+                            uid: _authService.user!.uid,
+                            name: name,
+                            pfpURL: pfpURL));
+
+
+                            print('-------------------------------');
+                    _alertService.showToasr(
+                        text: 'User registerd successfuly', icon: Icons.check);
+                  }
                 }
               }
             } catch (e) {

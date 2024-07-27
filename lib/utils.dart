@@ -1,6 +1,7 @@
 import 'package:chat_application/firebase_options.dart';
 import 'package:chat_application/service/alert_service.dart';
 import 'package:chat_application/service/auth_service.dart';
+import 'package:chat_application/service/database_service.dart';
 import 'package:chat_application/service/media_service%20.dart';
 import 'package:chat_application/service/navigation_service.dart';
 import 'package:chat_application/service/storge_service.dart';
@@ -32,5 +33,8 @@ Future<void> registerservice() async {
 
   getIt.registerSingleton<StorgeService>(
     StorgeService(),
+  );
+    getIt.registerSingleton<DatabaseService>(
+    DatabaseService(),
   );
 }
