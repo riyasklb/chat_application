@@ -1,6 +1,4 @@
 import 'dart:io';
-
-
 import 'package:chat_application/pages/models/user_model.dart';
 import 'package:chat_application/service/alert_service.dart';
 import 'package:chat_application/service/auth_service.dart';
@@ -32,6 +30,7 @@ class _ResgisterPageState extends State<ResgisterPage> {
     super.initState();
   }
 
+  bool isloading = false;
   late AlertService _alertService;
   late DatabaseService _databaseService;
   late StorgeService _storgeService;
@@ -58,8 +57,14 @@ class _ResgisterPageState extends State<ResgisterPage> {
         ),
         child: Column(
           children: [
-            _rgisterform(),
-            _loginAcount(),
+            if (!isloading) _rgisterform(),
+            if (!isloading) _loginAcount(),
+            if (isloading)
+              Expanded(
+                  child: Center(
+                      child: CircularProgressIndicator(
+                color: Colors.black,
+              )))
           ],
         ),
       ),
@@ -143,30 +148,50 @@ class _ResgisterPageState extends State<ResgisterPage> {
         child: MaterialButton(
           onPressed: () async {
             try {
-              print('-------------------------------');
+              print('-----------------1--------------');
               if ((_registerformkey.currentState?.validate() ?? false) &&
                   selectedimage != null) {
+                setState(() {
+                  isloading = true;
+                });
                 _registerformkey.currentState?.save();
                 bool result = await _authService.register(email!, password!);
-
+                print('-----------------2--------------');
                 if (result) {
+                  print('-----------------3--------------');
                   String? pfpURL = await _storgeService.uploadUserPfp(
                       file: selectedimage!, uid: _authService.user!.uid);
+                  print('-----------4--------------------');
                   if (pfpURL != null) {
+                    print('-----------------5--------------');
                     await _databaseService.createUserProfile(
                         userprofile: UserProfile(
                             uid: _authService.user!.uid,
                             name: name,
                             pfpURL: pfpURL));
 
-
-                            print('-------------------------------');
+                    print('-------------6------------------');
+                    setState(() {
+                      isloading = false;
+                    });
+                    _navigationService.goBack();
+                    _navigationService.pushReplacementNamed('/home');
                     _alertService.showToasr(
                         text: 'User registerd successfuly', icon: Icons.check);
+                  } else {
+                    throw Exception('Unable to user profile');
                   }
+                } else {
+                  throw Exception('Unable to register');
                 }
+              } else {
+                throw Exception('Unable to register');
               }
             } catch (e) {
+              setState(() {
+                isloading = false;
+              });
+              _alertService.showToasr(text: '$e', icon: Icons.error);
               print(e);
             }
           },
